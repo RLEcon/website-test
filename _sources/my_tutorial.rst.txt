@@ -1,0 +1,9 @@
+"""
+my first tutorial
+=================
+
+Joao B Sousa
+
+"""
+
+import numpy as np

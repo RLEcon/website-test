@@ -9,7 +9,8 @@ Welcome to docs-test's documentation!
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-
+   
+   My tutorial <./my_tutorial>
 
 
 Indices and tables
