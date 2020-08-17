@@ -10,8 +10,8 @@ Welcome to docs-test's documentation!
    :maxdepth: 2
    :caption: Contents:
    
-   My tutorial <./my_tutorial>
-
+   my_tutorial.rst
+   second_tutorial.rst
 
 Indices and tables
 ==================

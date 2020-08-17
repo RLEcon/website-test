@@ -1,0 +1,382 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Sequence-to-Sequence Modeling with nn.Transformer and TorchText &#8212; docs-test 0.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Introduction to TorchScript" href="my_tutorial.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="sequence-to-sequence-modeling-with-nn-transformer-and-torchtext">
+<h1>Sequence-to-Sequence Modeling with nn.Transformer and TorchText<a class="headerlink" href="#sequence-to-sequence-modeling-with-nn-transformer-and-torchtext" title="Permalink to this headline">¶</a></h1>
+<p>This is a tutorial on how to train a sequence-to-sequence model
+that uses the
+<a class="reference external" href="https://pytorch.org/docs/master/nn.html?highlight=nn%20transformer#torch.nn.Transformer">nn.Transformer</a> module.</p>
+<p>PyTorch 1.2 release includes a standard transformer module based on the
+paper <a class="reference external" href="https://arxiv.org/pdf/1706.03762.pdf">Attention is All You
+Need</a>. The transformer model
+has been proved to be superior in quality for many sequence-to-sequence
+problems while being more parallelizable. The <code class="docutils literal notranslate"><span class="pre">nn.Transformer</span></code> module
+relies entirely on an attention mechanism (another module recently
+implemented as <a class="reference external" href="https://pytorch.org/docs/master/nn.html?highlight=multiheadattention#torch.nn.MultiheadAttention">nn.MultiheadAttention</a>) to draw global dependencies
+between input and output. The <code class="docutils literal notranslate"><span class="pre">nn.Transformer</span></code> module is now highly
+modularized such that a single component (like <a class="reference external" href="https://pytorch.org/docs/master/nn.html?highlight=nn%20transformerencoder#torch.nn.TransformerEncoder">nn.TransformerEncoder</a>
+in this tutorial) can be easily adapted/composed.</p>
+<img alt="../_static/img/transformer_architecture.jpg" src="../_static/img/transformer_architecture.jpg" />
+<p>#</p>
+<p># probability for the likelihood of a given word (or a sequence of words)
+# to follow a sequence of words. A sequence of tokens are passed to the embedding
+# layer first, followed by a positional encoding layer to account for the order
+# of the word (see the next paragraph for more details). The
+# <code class="docutils literal notranslate"><span class="pre">nn.TransformerEncoder</span></code> consists of multiple layers of
+# <a class="reference external" href="https://pytorch.org/docs/master/nn.html?highlight=transformerencoderlayer#torch.nn.TransformerEncoderLayer">nn.TransformerEncoderLayer</a>. Along with the input sequence, a square
+# attention mask is required because the self-attention layers in
+# <code class="docutils literal notranslate"><span class="pre">nn.TransformerEncoder</span></code> are only allowed to attend the earlier positions in
+# the sequence. For the language modeling task, any tokens on the future
+# positions should be masked. To have the actual words, the output
+# of <code class="docutils literal notranslate"><span class="pre">nn.TransformerEncoder</span></code> model is sent to the final Linear
+# layer, which is followed by a log-Softmax function.
+#</p>
+<p>import math
+import torch
+import torch.nn as nn
+import torch.nn.functional as F</p>
+<p>class TransformerModel(nn.Module):</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>def __init__(self, ntoken, ninp, nhead, nhid, nlayers, dropout=0.5):</dt>
+<dd><p class="first">super(TransformerModel, self).__init__()
+from torch.nn import TransformerEncoder, TransformerEncoderLayer
+self.model_type = ‘Transformer’
+self.src_mask = None
+self.pos_encoder = PositionalEncoding(ninp, dropout)
+encoder_layers = TransformerEncoderLayer(ninp, nhead, nhid, dropout)
+self.transformer_encoder = TransformerEncoder(encoder_layers, nlayers)
+self.encoder = nn.Embedding(ntoken, ninp)
+self.ninp = ninp
+self.decoder = nn.Linear(ninp, ntoken)</p>
+<p class="last">self.init_weights()</p>
+</dd>
+<dt>def _generate_square_subsequent_mask(self, sz):</dt>
+<dd>mask = (torch.triu(torch.ones(sz, sz)) == 1).transpose(0, 1)
+mask = mask.float().masked_fill(mask == 0, float(‘-inf’)).masked_fill(mask == 1, float(0.0))
+return mask</dd>
+<dt>def init_weights(self):</dt>
+<dd>initrange = 0.1
+self.encoder.weight.data.uniform_(-initrange, initrange)
+self.decoder.bias.data.zero_()
+self.decoder.weight.data.uniform_(-initrange, initrange)</dd>
+<dt>def forward(self, src):</dt>
+<dd><dl class="first docutils">
+<dt>if self.src_mask is None or self.src_mask.size(0) != len(src):</dt>
+<dd>device = src.device
+mask = self._generate_square_subsequent_mask(len(src)).to(device)
+self.src_mask = mask</dd>
+</dl>
+<p class="last">src = self.encoder(src) * math.sqrt(self.ninp)
+src = self.pos_encoder(src)
+output = self.transformer_encoder(src, self.src_mask)
+output = self.decoder(output)
+return output</p>
+</dd>
+</dl>
+</div></blockquote>
+<p># positional encodings have the same dimension as the embeddings so that
+# the two can be summed. Here, we use <code class="docutils literal notranslate"><span class="pre">sine</span></code> and <code class="docutils literal notranslate"><span class="pre">cosine</span></code> functions of
+# different frequencies.
+#</p>
+<p>class PositionalEncoding(nn.Module):</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>def __init__(self, d_model, dropout=0.1, max_len=5000):</dt>
+<dd><p class="first">super(PositionalEncoding, self).__init__()
+self.dropout = nn.Dropout(p=dropout)</p>
+<p class="last">pe = torch.zeros(max_len, d_model)
+position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
+div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
+pe[:, 0::2] = torch.sin(position * div_term)
+pe[:, 1::2] = torch.cos(position * div_term)
+pe = pe.unsqueeze(0).transpose(0, 1)
+self.register_buffer(‘pe’, pe)</p>
+</dd>
+<dt>def forward(self, x):</dt>
+<dd>x = x + self.pe[:x.size(0), :]
+return self.dropout(x)</dd>
+</dl>
+</div></blockquote>
+<p>#</p>
+<p># tokens into tensors. Starting from sequential data, the <code class="docutils literal notranslate"><span class="pre">batchify()</span></code>
+# function arranges the dataset into columns, trimming off any tokens remaining
+# after the data has been divided into batches of size <code class="docutils literal notranslate"><span class="pre">batch_size</span></code>.
+# For instance, with the alphabet as the sequence (total length of 26)
+# and a batch size of 4, we would divide the alphabet into 4 sequences of
+# length 6:
+#
+# .. math::
+#   begin{bmatrix}
+#   text{A} &amp; text{B} &amp; text{C} &amp; ldots &amp; text{X} &amp; text{Y} &amp; text{Z}
+#   end{bmatrix}
+#   Rightarrow
+#   begin{bmatrix}
+#   begin{bmatrix}text{A} \ text{B} \ text{C} \ text{D} \ text{E} \ text{F}end{bmatrix} &amp;
+#   begin{bmatrix}text{G} \ text{H} \ text{I} \ text{J} \ text{K} \ text{L}end{bmatrix} &amp;
+#   begin{bmatrix}text{M} \ text{N} \ text{O} \ text{P} \ text{Q} \ text{R}end{bmatrix} &amp;
+#   begin{bmatrix}text{S} \ text{T} \ text{U} \ text{V} \ text{W} \ text{X}end{bmatrix}
+#   end{bmatrix}
+#
+# These columns are treated as independent by the model, which means that
+# the dependence of <code class="docutils literal notranslate"><span class="pre">G</span></code> and <code class="docutils literal notranslate"><span class="pre">F</span></code> can not be learned, but allows more
+# efficient batch processing.
+#</p>
+<p>import torchtext
+from torchtext.data.utils import get_tokenizer
+TEXT = torchtext.data.Field(tokenize=get_tokenizer(“basic_english”),</p>
+<blockquote>
+<div>init_token=’&lt;sos&gt;’,
+eos_token=’&lt;eos&gt;’,
+lower=True)</div></blockquote>
+<p>train_txt, val_txt, test_txt = torchtext.datasets.WikiText2.splits(TEXT)
+TEXT.build_vocab(train_txt)
+device = torch.device(“cuda” if torch.cuda.is_available() else “cpu”)</p>
+<dl class="docutils">
+<dt>def batchify(data, bsz):</dt>
+<dd>data = TEXT.numericalize([data.examples[0].text])
+# Divide the dataset into bsz parts.
+nbatch = data.size(0) // bsz
+# Trim off any extra elements that wouldn’t cleanly fit (remainders).
+data = data.narrow(0, 0, nbatch * bsz)
+# Evenly divide the data across the bsz batches.
+data = data.view(bsz, -1).t().contiguous()
+return data.to(device)</dd>
+</dl>
+<p>batch_size = 20
+eval_batch_size = 10
+train_data = batchify(train_txt, batch_size)
+val_data = batchify(val_txt, eval_batch_size)
+test_data = batchify(test_txt, eval_batch_size)</p>
+<p>#</p>
+<p># length <code class="docutils literal notranslate"><span class="pre">bptt</span></code>. For the language modeling task, the model needs the
+# following words as <code class="docutils literal notranslate"><span class="pre">Target</span></code>. For example, with a <code class="docutils literal notranslate"><span class="pre">bptt</span></code> value of 2,
+# we’d get the following two Variables for <code class="docutils literal notranslate"><span class="pre">i</span></code> = 0:
+#
+# .. image:: ../_static/img/transformer_input_target.png
+#
+# It should be noted that the chunks are along dimension 0, consistent
+# with the <code class="docutils literal notranslate"><span class="pre">S</span></code> dimension in the Transformer model. The batch dimension
+# <code class="docutils literal notranslate"><span class="pre">N</span></code> is along dimension 1.
+#</p>
+<p>bptt = 35
+def get_batch(source, i):</p>
+<blockquote>
+<div>seq_len = min(bptt, len(source) - 1 - i)
+data = source[i:i+seq_len]
+target = source[i+1:i+1+seq_len].view(-1)
+return data, target</div></blockquote>
+<p>#</p>
+<p>#</p>
+<p>ntokens = len(TEXT.vocab.stoi) # the size of vocabulary
+emsize = 200 # embedding dimension
+nhid = 200 # the dimension of the feedforward network model in nn.TransformerEncoder
+nlayers = 2 # the number of nn.TransformerEncoderLayer in nn.TransformerEncoder
+nhead = 2 # the number of heads in the multiheadattention models
+dropout = 0.2 # the dropout value
+model = TransformerModel(ntokens, emsize, nhead, nhid, nlayers, dropout).to(device)</p>
+<p>#</p>
+<p># <a class="reference external" href="https://pytorch.org/docs/master/optim.html?highlight=sgd#torch.optim.SGD">SGD</a>
+# implements stochastic gradient descent method as the optimizer. The initial
+# learning rate is set to 5.0. <a class="reference external" href="https://pytorch.org/docs/master/optim.html?highlight=steplr#torch.optim.lr_scheduler.StepLR">StepLR</a> is
+# applied to adjust the learn rate through epochs. During the
+# training, we use
+# <a class="reference external" href="https://pytorch.org/docs/master/nn.html?highlight=nn%20utils%20clip_grad_norm#torch.nn.utils.clip_grad_norm_">nn.utils.clip_grad_norm_</a>
+# function to scale all the gradient together to prevent exploding.
+#</p>
+<p>criterion = nn.CrossEntropyLoss()
+lr = 5.0 # learning rate
+optimizer = torch.optim.SGD(model.parameters(), lr=lr)
+scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 1.0, gamma=0.95)</p>
+<p>import time
+def train():</p>
+<blockquote>
+<div><p>model.train() # Turn on the train mode
+total_loss = 0.
+start_time = time.time()
+ntokens = len(TEXT.vocab.stoi)
+for batch, i in enumerate(range(0, train_data.size(0) - 1, bptt)):</p>
+<blockquote>
+<div><p>data, targets = get_batch(train_data, i)
+optimizer.zero_grad()
+output = model(data)
+loss = criterion(output.view(-1, ntokens), targets)
+loss.backward()
+torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
+optimizer.step()</p>
+<p>total_loss += loss.item()
+log_interval = 200
+if batch % log_interval == 0 and batch &gt; 0:</p>
+<blockquote>
+<div><p>cur_loss = total_loss / log_interval
+elapsed = time.time() - start_time
+print(‘| epoch {:3d} | {:5d}/{:5d} batches | ‘</p>
+<blockquote>
+<div><p>‘lr {:02.2f} | ms/batch {:5.2f} | ‘
+‘loss {:5.2f} | ppl {:8.2f}’.format(</p>
+<blockquote>
+<div>epoch, batch, len(train_data) // bptt, scheduler.get_lr()[0],
+elapsed * 1000 / log_interval,
+cur_loss, math.exp(cur_loss)))</div></blockquote>
+</div></blockquote>
+<p>total_loss = 0
+start_time = time.time()</p>
+</div></blockquote>
+</div></blockquote>
+</div></blockquote>
+<dl class="docutils">
+<dt>def evaluate(eval_model, data_source):</dt>
+<dd><p class="first">eval_model.eval() # Turn on the evaluation mode
+total_loss = 0.
+ntokens = len(TEXT.vocab.stoi)
+with torch.no_grad():</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>for i in range(0, data_source.size(0) - 1, bptt):</dt>
+<dd>data, targets = get_batch(data_source, i)
+output = eval_model(data)
+output_flat = output.view(-1, ntokens)
+total_loss += len(data) * criterion(output_flat, targets).item()</dd>
+</dl>
+</div></blockquote>
+<p class="last">return total_loss / (len(data_source) - 1)</p>
+</dd>
+</dl>
+<p>best_val_loss = float(“inf”)
+epochs = 3 # The number of epochs
+best_model = None</p>
+<dl class="docutils">
+<dt>for epoch in range(1, epochs + 1):</dt>
+<dd><p class="first">epoch_start_time = time.time()
+train()
+val_loss = evaluate(model, val_data)
+print(‘-‘ * 89)
+print(‘| end of epoch {:3d} | time: {:5.2f}s | valid loss {:5.2f} | ‘</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>‘valid ppl {:8.2f}’.format(epoch, (time.time() - epoch_start_time),</dt>
+<dd>val_loss, math.exp(val_loss)))</dd>
+</dl>
+</div></blockquote>
+<p>print(‘-‘ * 89)</p>
+<dl class="docutils">
+<dt>if val_loss &lt; best_val_loss:</dt>
+<dd>best_val_loss = val_loss
+best_model = model</dd>
+</dl>
+<p class="last">scheduler.step()</p>
+</dd>
+</dl>
+<p>#
+# Apply the best model to check the result with the test dataset.</p>
+<p>test_loss = evaluate(best_model, test_data)
+print(‘=’ * 89)
+print(‘| End of training | test loss {:5.2f} | test ppl {:8.2f}’.format(</p>
+<blockquote>
+<div>test_loss, math.exp(test_loss)))</div></blockquote>
+<p>print(‘=’ * 89)</p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">docs-test</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="my_tutorial.html">Introduction to TorchScript</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Sequence-to-Sequence Modeling with nn.Transformer and TorchText</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="my_tutorial.html" title="previous chapter">Introduction to TorchScript</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, joao and fabian.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/transformer_tutorial.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

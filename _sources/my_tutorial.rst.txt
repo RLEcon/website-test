@@ -1,9 +1,16 @@
-"""
-my first tutorial
-=================
+Introduction 
+============
 
-Joao B Sousa
+Joao B. Sousa
 
-"""
+-------------
+import torch  # This is all you need to use both PyTorch and TorchScript!
+print(torch.__version__)
 
-import numpy as np
+class MyCell(torch.nn.Module):
+    def __init__(self):
+        super(MyCell, self).__init__()
+
+    def forward(self, x, h):
+        new_h = torch.tanh(x + h)
+        return new_h, new_h
