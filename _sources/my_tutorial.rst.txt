@@ -1,3 +1,4 @@
+============
 Introduction 
 ============
 
@@ -15,7 +16,7 @@ To add content, create a new `.rst` file in the `source` folder, and add this
 file to the `index.rst`. 
 
 For more details follow the offical `Getting started tutorial
-<https://www.sphinx-doc.org/en/master/usage/quickstart.html#defining-document-structure>`_. 
+<https://www.sphinx-doc.org/en/master/usage/quickstart.html#defining-document-structure/>`_. 
 
 
 
