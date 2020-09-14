@@ -11,7 +11,6 @@ file to the `index.rst`.
 
 Then, navigate to the root folder and run `make html` to build.
 
-For more details follow the offical [Getting started tutorial]
-(https://www.sphinx-doc.org/en/master/usage/quickstart.html#defining-document-structure/>).
+For more details follow the offical [Getting started tutorial](https://www.sphinx-doc.org/en/master/usage/quickstart.html#defining-document-structure/>).
 
 Live website: https://rlecon.github.io/website-test.github.io/
