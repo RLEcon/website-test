@@ -11,6 +11,7 @@ Welcome to docs-test's documentation!
    :caption: Contents:
    
    introduction.rst
+   modelling_bid_ask_spreads.rst
 
 Indices and tables
 ==================

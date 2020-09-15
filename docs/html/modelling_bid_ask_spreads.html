@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Welcome to docs-test’s documentation! &#8212; docs-test 0.0 documentation</title>
+    <title>Different Approaches to Model the Bid-Ask Spread &#8212; docs-test 0.0 documentation</title>
     <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
@@ -17,7 +17,7 @@
     <script type="text/javascript" src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Introduction" href="introduction.html" />
+    <link rel="prev" title="Introduction" href="introduction.html" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <!--[if lt IE 9]>
     <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
@@ -31,25 +31,19 @@
              accesskey="I">index</a></li>
         <li class="right" >
           <a href="introduction.html" title="Introduction"
-             accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">docs-test 0.0 documentation</a> &#187;</li> 
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">docs-test 0.0 documentation</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="#">Table of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Welcome to docs-test’s documentation!</a></li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
-</ul>
-
-  <h4>Next topic</h4>
+  <h4>Previous topic</h4>
   <p class="topless"><a href="introduction.html"
-                        title="next chapter">Introduction</a></p>
+                        title="previous chapter">Introduction</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/index.rst.txt"
+      <li><a href="_sources/modelling_bid_ask_spreads.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -73,23 +67,37 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="welcome-to-docs-test-s-documentation">
-<h1>Welcome to docs-test’s documentation!<a class="headerlink" href="#welcome-to-docs-test-s-documentation" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modelling_bid_ask_spreads.html">Different Approaches to Model the Bid-Ask Spread</a></li>
-</ul>
-</div>
-</div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
-<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
-<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
-</ul>
+  <div class="section" id="different-approaches-to-model-the-bid-ask-spread">
+<h1>Different Approaches to Model the Bid-Ask Spread<a class="headerlink" href="#different-approaches-to-model-the-bid-ask-spread" title="Permalink to this headline">¶</a></h1>
+<p>Duffie:
+Bid-ask spreads are described via a search model with three participatens.
+Potential buyers and seller are randomly matched and bargain about the price
+for a trade. That bargaining process is influenced by their outside options.
+Interestingly, the autcome of this bargaining process is not a bid-ask spread
+but only a price, in the same way as it was in the example Joao showed. The
+investor are motivated to buy and sell the asset by exogenous shocks. Besides
+trading with another investor, the traders might also be matched with a
+marketmarker. The marketmaker can both buy and sell an asset and therefore be
+considered as “investory” for a seller and source of asset for a buyer. The
+<a href="#id1"><span class="problematic" id="id2">``</span></a>Bid’’ is the price at which the marketmaker buys from the seller, and the
+<a href="#id3"><span class="problematic" id="id4">``</span></a>Ask’’ is the price at which the marketmaker sells to an investor. Crucially,
+bid and ask only exists because of the marketmaker. The anaylsis in the paper
+shows that if the marketmaker has zero bargaining power, the bid-ask spread
+collapses to zero. Similiarly, if the direct meeting technology between
+investors improves, the bid-ask spread falls.</p>
+<p>Gloston and Milgrom:
+Bid-ask spreads are also result in an interaction with marketmakers, this time
+it is explained by asymmetric information. The marketmeter sets the bid and ask
+prices so that he makes zero profit in the face of tradining with superior
+informed traders. The ask price, for example, is such that the marketmaker has
+no incentive to revise his valuation of the asset, if the next investor is a
+buyer. (I do not understand why the ask does not exceed the bid, that doesn’t
+make sense though).</p>
+<p>Glosten: (Electronic Limit Order Book):
+This is a very interesting article, and one that describes the existence of
+bid-ask spreads even in the absence of marketmakers. The set-up of the economy
+very much resembles a realistic set-up we could use, but I have to undersand
+the entire paper much better to say something meaningful about it.</p>
 </div>
 
 
@@ -106,8 +114,8 @@
              >index</a></li>
         <li class="right" >
           <a href="introduction.html" title="Introduction"
-             >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">docs-test 0.0 documentation</a> &#187;</li> 
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">docs-test 0.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
