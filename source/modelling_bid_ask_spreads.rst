@@ -33,23 +33,30 @@ make sense though).
 
 Glosten: (Electronic Limit Order Book)
 --------------------------------------
-This is a very interesting article, and one that describes the existence of
-bid-ask spreads even in the absence of marketmakers. The set-up of the economy
-very much resembles a realistic set-up we could use, but I have to undersand
-the entire paper much better to say something meaningful about it.
-Nevertheless, there are two types of agents in the economy. A continuous of
-risk aversve buyer and sellers which take a schedule of bids and ask prices as
-given. This function describe the marginal costs of buying (selling) a
-particular quantitiy of assets. These agents buy and sell assets in order to
-maximize their expected utility. The other types of agents are randonly
-arriving liquidtiy providers, which provide bids and asks. These types of
-agents are risk-neural and take the behaviour of the buyers as given. The
-liquidity providers seem to trade on private information. Based on these two
-groups of agents and equilibrium is characterized. There seems to be a
-parmanent bid and ask spread but I have not yet understood the reason for it.
+This is a very interesting article. The paper seems to be to me an extension of
+his older paper with Milgrom. Glosten seesm to allow traders a larger action
+space (they can decide not only whether to buy or sell at a given bid and ask
+but also how much). Suppliers of bid and asks therefore seem to find it optimal
+to provide a schedule of bids and asks at different prices. The traders have
+superior information and take the schedule (limit order schedule) of bid and
+aks as given. The traders receive (potentially) private information and when it
+is (stochastically) they turn to decide to trade, their trading decisions are
+maximizing their expected utility. Liquidity suppliers take the behaviour of
+the traders as given and can provide bid and aks spreads. *A description of the
+behaviour of the liquidity providers follows later*
+
+Kyle (1985)
+-----------
+I should have a look at this paper again. 
 
 *Questions*
 -----------
 - I am not sure why there are two types of agents
 - What is the horizon of the bid and ask spreads? How long are they in the
   order book?
+- I do not understand if, from a modelling perspective, it makes sense to
+  combine the liquidity providers and the traders in one agent (as we have done
+  it in the double aution market) or whether these should be separate agents.
+- I also have not understood the role of budget constraints here
+
+
