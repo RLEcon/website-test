@@ -22,13 +22,28 @@ investors improves, the bid-ask spread falls.
 
 Gloston and Milgrom
 -------------------
-Bid-ask spreads are also result in an interaction with marketmakers, this time
-it is explained by asymmetric information. The marketmeter sets the bid and ask
-prices so that he makes zero profit in the face of tradining with superior
-informed traders. The ask price, for example, is such that the marketmaker has
-no incentive to revise his valuation of the asset, if the next investor is a
-buyer. (I do not understand why the ask does not exceed the bid, that doesn't
-make sense though).
+While the bid-ask spread in the paper of Duffie et al was expalained by a
+marketmaker's bargaining power, Gloston and Milgrom explain the spread through
+asymmetric information. The spread is necessary for an uniformed marketmaker to
+just break even in the face of trading with superior informed traders. 
+Gloson and Milgrom postulate a model with two types of agents, (Potentially)
+informed traders and uniformed marketmakers. The agents trade in an
+(stochastic) asset which yields a payout at some future data. Traders have
+private information about the final payout, but also have some liquditiy motive
+for trading. Marketmaker hold inventory over the asset, do not have private
+information about the asset, but can discern the trader's valuation from their
+decision to buy or sell an asset. The marketmaker can set a bid and and ask
+price. Note, that in Gloston and Milgrom's paper, Bid and Ask prices are
+reversed: The bid price is the price at which the marketmaker is willing to buy
+an asset, and the ask price is the price at which he is willing to sell. Thus,
+ask prices exceeds bids. The bid price is then set to be the marketmakers
+valuaton of the asset conditional on the trader wanting the sell the asset:
+Suppose so far, the marketmaker thinks the valuation of the asset is $V$, and
+the markemaker would be willing to buy the asset at $P=V$. If the next trader
+however would be willing to sell the asset at that price, the markemaker might
+be tempted to revise his valuation of the asset downwards. Thus, the bid price
+equals the markemakers valuation of the asset condtional on the next traders
+electing to sell the asset.
 
 
 Glosten: (Electronic Limit Order Book)
@@ -45,9 +60,15 @@ maximizing their expected utility. Liquidity suppliers take the behaviour of
 the traders as given and can provide bid and aks spreads. *A description of the
 behaviour of the liquidity providers follows later*
 
-Kyle (1985)
------------
-I should have a look at this paper again. 
+Kyle (1985); Continuous Auction Trading
+---------------------------------------
+
+
+Ho and Stoll (1981)
+-------------------
+Inventory Costs?
+
+
 
 *Questions*
 -----------
@@ -58,5 +79,3 @@ I should have a look at this paper again.
   combine the liquidity providers and the traders in one agent (as we have done
   it in the double aution market) or whether these should be separate agents.
 - I also have not understood the role of budget constraints here
-
-
