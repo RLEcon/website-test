@@ -62,20 +62,32 @@ behaviour of the liquidity providers follows later*
 
 Kyle (1985); Continuous Auction Trading
 ---------------------------------------
-
+Kyle describes an economy with three types of agents trading a claim to an
+asset with publically unknown liquidation value. A trader with private
+information about the liquidation value of an asset, a noise trader, and an
+uninformed market maker who sets price to equate supply and demand. Kyle
+thereby was able to coin a very influential measurement for the asset's
+liquidity: Kyle's lambda. The action spaces of the agents are very interesting:
+Both the informed and the uninformed (noise) trade submit market orders, that
+is they specify the number of assets they want to trade. However, they do not
+know the resulting price at which their orders are fulfilled. The market maker
+set the price such that his expectations about the asset's liquidation value,
+conditional on the sum of the market orders, equals the price of the asset.
+Kyle's lambda specifies how much the price of an asset reacts as a function of
+the sum of the market orders. The parameter essentially describes how much the
+market maker adjusts his expectations about the asset's liquidation value after
+observing the order flow. An illiquid market is said to be characterized by a
+high lambda. 
 
 Ho and Stoll (1981)
 -------------------
-Inventory Costs?
-
-
-
-*Questions*
------------
-- I am not sure why there are two types of agents
-- What is the horizon of the bid and ask spreads? How long are they in the
-  order book?
-- I do not understand if, from a modelling perspective, it makes sense to
-  combine the liquidity providers and the traders in one agent (as we have done
-  it in the double aution market) or whether these should be separate agents.
-- I also have not understood the role of budget constraints here
+This is an interesting classic paper. The paper derives the bid-ask spread
+throguh the utility maximizing behaviour of a single dealer. The dealer has a
+personal private opinion about a true value of a asset he trades and is exposed
+to random matches with a buyer and a seller of the stock. The likelihood of
+matches is influenced by the bid-ask spread set by the dealer. For me, the
+paper was similar to the profit maximizing behaviour of a monopolist who takes
+the demand curve as give. The optimal bid ask spread equals the optimal bid-ask
+spread of a risk-neural deal given the exogenous demand, plus adjustments for
+uncertainty in transcation volumne, flucuations of the underlying asset, and
+risk preferences.
