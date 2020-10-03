@@ -91,3 +91,32 @@ the demand curve as give. The optimal bid ask spread equals the optimal bid-ask
 spread of a risk-neural deal given the exogenous demand, plus adjustments for
 uncertainty in transcation volumne, flucuations of the underlying asset, and
 risk preferences.
+
+
+Comments about Market Structure
+-------------------------------
+The papers above model the bid ask spread mostly with dealers. We however have
+so far only used traders and not employed dealers. This section describes
+traders and dealers in more detail:
+
+Traders can in general trade with two different actions: They can use market
+orders or limit orders. Market ordes (as used for example in Kyle's paper)
+guarnatee execution of a trade but do not allow the agent to know the price of
+the trade in advance. The trade simply states that he/she is willing to trade
+and he is then matched with the best availble price for him/her. Limit order in
+contrast allow traders to guarantee the most unfavourable price for a trade,
+but does not allow traders to guarantee execution of the trade. The limit order
+specifies the highest (lowest) price an agent is willing to buy (sell) and the
+trade is execute if another side of the trade can be found willing offering the
+sell (buy) at this or a more favorable price.\\
+
+Dealers can quote the bid and ask price at which they are willing to trade.
+They make their money from buying cheaply and selling expensively. Dealers are
+therfore interested in setting the bid and ask spread as widely as possible.
+Dealers however compete with public limit oders set by traders (or other
+dealers). If the public limit orders are set very aggressively, bid-ask spreads
+are small and dealers cannot profit much. In contrast, if they spreads are
+large dealers benefits handsomly, which however lures other dealers into the
+market or encourages public limit orders from traders. 
+
+STILL need to describe the continous order driven markets
