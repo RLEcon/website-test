@@ -36,7 +36,30 @@ is preserved.
 
 Do liquidity measures measure liquidity
 --------------------------------------
+This is a very interesting paper comparing different liquidity measurements.
+There are are several different liqudity measurements and it is often not clear
+which one one should use. Most of these liquditiy measurements are
+approximations and often chosen due to its (relative) simplicity of
+calculations. The authors calculate a high quality measurement of bid-ask
+spreads from high frequency data taken from the TAQ database. This measurement
+is then related to popular liqudity measurements which are often not that
+difficult to compute. The authors shows that several measurements are good. In
+particular, the Roll (1984) effective bid-ask spread seems to be a good
+measure. There are several other more modern good measurements which I did not
+know. Interestingy, the authors suggests that the measurement taken in
+``Liqudity Risk and Expected Stock Returns`` is not that good.
 
 
 Differential Interpretation of Public Signals and Trade in Speculative Markets
 ------------------------------------------------------------------------------
+
+Commonality in Liquidity
+------------------------
+This is another fascinating paper. The paper documents that liquidity movements
+of stocks are correlated among each other. The paper begins by stressing that
+so far liquidity has been studied in isolation for each stock. The authors
+however ask if liquidity movements of one stock correlate with the variation in
+liquidity of another stock. The authors document that there is indeed a strong
+common component of liquiditiy variations across stocks. The authors do not
+related this common component to any industry wide factors of the business
+cycles but leave this question open for further research.
